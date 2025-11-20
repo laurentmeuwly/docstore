@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::create('folders', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('parent_id')->nullable()->constrained('folders')->nullOnDelete();
+            $table->string('name')->index();
+            $table->integer('position')->default(0);
+            $table->timestamps();
+        });
+
+        Schema::create('documents', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('folder_id')->nullable()->constrained('folders')->nullOnDelete();
+            $table->string('title');
+            $table->string('filename');
+            $table->string('mime_type')->default('application/pdf');
+            $table->string('disk')->nullable();
+            $table->string('path')->index();
+            $table->json('meta')->nullable();
+            $table->unsignedBigInteger('size')->default(0);
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('documents');
+        Schema::dropIfExists('folders');
+    }
+};
+

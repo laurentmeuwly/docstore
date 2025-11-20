@@ -1,0 +1,59 @@
+{
+    "name": "laurentmeuwly/docstore",
+    "description": "A minimal and extensible document manager for Laravel applications.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Laurent Meuwly",
+            "email": "laurent@lmeuwly.ch",
+            "homepage": "https://axonium.ch",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "LaurentMeuwly\\Docstore\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaurentMeuwly\\Docstore\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaurentMeuwly\\Docstore\\DocstoreServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "php": ">=8.2",
+        "illuminate/support": "^10.0|^11.0"
+    },
+    "require-dev": {
+        "laravel/passport": "^11.0|^12.0",
+        "laravel/pint": "^1.0",
+        "orchestra/testbench": "^9.15",
+        "phpunit/phpunit": "^11.5",
+        "pestphp/pest": "^3.8",
+        "pestphp/pest-plugin-laravel": "^3.2",
+        "phpstan/phpstan": "^2.1",
+        "larastan/larastan": "^3.8"
+    },
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "analyse": "vendor/bin/phpstan analyse",
+        "format": "vendor/bin/pint",
+        "lint": "vendor/bin/pint --test",
+        "lint-fix": "vendor/bin/pint"
+    }
+}
