@@ -1,256 +1,270 @@
-# Docstore
-Un mini-package Laravel pour gérer des documents et dossiers (upload, stockage, organisation, accès, téléchargement), extensible selon les besoins de votre application.
+# DocStore
 
----
+![Laravel](https://img.shields.io/badge/Laravel-10|11|12-red)
+![PHP](https://img.shields.io/badge/PHP-8.2+-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+[![Tests](https://github.com/laurentmeuwly/docstore/actions/workflows/tests.yml/badge.svg)](https://github.com/laurentmeuwly/docstore/actions/workflows/tests.yml)
 
-## Fonctionnalités
+Docstore is a small, extensible Laravel package for managing folders and documents in an application. It provides Eloquent models, migrations, a download route, and a configurable visibility resolver, while leaving the business rules to the host application.
 
-- Gestion de **dossiers hiérarchiques** (parents/enfants)  
-- Gestion de **documents** (titre, fichier, métadonnées, taille, type MIME…)  
-- Stockage via le **Laravel Filesystem** (local, S3, etc.)  
-- Téléchargement sécurisé via un **resolver de visibilité**  
-- Architecture entièrement **extensible** :  
-  - surcharge des modèles  
-  - surcharge de la logique métier  
-  - surcharge de la logique d’accès (`DocumentVisibilityResolver`)  
-- Intégration simple dans tout projet Laravel 10 ou 11  
-- Compatible PHP **>= 8.2**
+The package is intentionally generic. It does not contain project-specific rules and can be reused in Laravel applications that need a lightweight document store.
 
----
+## Features
+
+- Hierarchical folders with parent/children relationships
+- Document metadata: title, filename, MIME type, disk, path, size and JSON metadata
+- Storage through the Laravel filesystem
+- Secure downloads through a configurable visibility resolver
+- Configurable model classes for application-specific extensions
+- Laravel package auto-discovery
+- Laravel 10, 11 and 12 support
+- PHP 8.2+
 
 ## Installation
 
-```
+```bash
 composer require laurentmeuwly/docstore
 ```
 
-Puis publier la configuration :
+Publish the configuration file:
 
-```
+```bash
 php artisan docstore:install
 ```
 
-Si vous souhaitez publier les migrations :
+Publish the configuration file and migrations:
 
-```
+```bash
 php artisan docstore:install --migrations
+```
+
+Then run your migrations:
+
+```bash
+php artisan migrate
 ```
 
 ## Configuration
 
-Le fichier publié config/docstore.php contient :
+After installation, the package configuration is available in `config/docstore.php`.
 
-```
+```php
 return [
-    'storage_disk' => 'local',    // disque utilisé pour stocker les fichiers
-    'base_path' => 'docstore',    // dossier racine dans le disque
+    'storage_disk' => 'local',
+
+    'base_path' => 'docstore',
 
     'visibility' => [
-        'resolver' => null,       // classe de résolution d'accès (null => accès autorisé)
+        'resolver' => \LaurentMeuwly\Docstore\Services\AllowAllVisibilityResolver::class,
     ],
 
     'models' => [
         'document' => \LaurentMeuwly\Docstore\Models\Document::class,
-        'folder'   => \LaurentMeuwly\Docstore\Models\Folder::class,
+        'folder' => \LaurentMeuwly\Docstore\Models\Folder::class,
     ],
 ];
 ```
 
-## Modèles Eloquent
+## Data model
 
-Le package fournit deux modèles :
+### Folder
 
-Folder
+The default `Folder` model contains:
 
-id
+- `id`
+- `parent_id`
+- `name`
+- `position`
+- timestamps
 
-parent_id
+Relations:
 
-name
+- `parent()`
+- `children()`
+- `documents()`
 
-order
+Accessors:
 
-relations : parent, children, documents
+- `full_path`
 
-Document
+### Document
 
-id
+The default `Document` model contains:
 
-folder_id
+- `id`
+- `folder_id`
+- `title`
+- `filename`
+- `mime_type`
+- `disk`
+- `path`
+- `meta`
+- `size`
+- timestamps
 
-title
+Relations:
 
-filename
+- `folder()`
 
-disk
+Accessors and helpers:
 
-path
+- `url()`
+- `formatted_size`
+- `formatted_date`
 
-mime_type
+## Extending models
 
-size
+You may replace the default models with your own application models.
 
-meta (JSON)
-
-relations : folder
-
-méthodes utiles :
-
-url() → URL de téléchargement
-
-formatted_size
-
-formatted_date
-
-Surcharger les modèles dans votre application
-
-Si vous souhaitez ajouter vos propres relations, règles métier ou traductions, créez vos modèles dans app/Models.
-
-Exemple : app/Models/Document.php
-
+```php
 namespace App\Models;
 
 class Document extends \LaurentMeuwly\Docstore\Models\Document
 {
-    // Ajoutez vos propres propriétés, casts, scopes, relations, etc.
+    // Add application-specific casts, relations, scopes or policies.
 }
+```
 
+Then update `config/docstore.php`:
 
-Puis dans config/docstore.php :
-
+```php
 'models' => [
     'document' => \App\Models\Document::class,
-    'folder'   => \App\Models\Folder::class,
+    'folder' => \App\Models\Folder::class,
 ],
+```
 
+The package will use the configured classes for its relationships and download logic.
 
-Toutes les relations du package (Folder→Document, etc.) utiliseront automatiquement vos modèles.
+## Visibility resolver
 
-## Gestion des accès (Visibility Resolver)
+Downloads are protected by a visibility resolver. The default resolver allows access to every authenticated user that can reach the route.
 
-Par défaut, tout le monde peut télécharger tous les documents.
+To implement custom access rules, create a class implementing `DocumentVisibilityResolver`:
 
-Pour restreindre l'accès, implémentez le contrat :
+```php
+namespace App\Services;
 
-use LaurentMeuwly\Docstore\Contracts\DocumentVisibilityResolver;
-use LaurentMeuwly\Docstore\Models\Document;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
+use LaurentMeuwly\Docstore\Contracts\DocumentVisibilityResolver;
 
-class ProcoradVisibilityResolver implements DocumentVisibilityResolver
+class DocumentVisibilityResolver implements DocumentVisibilityResolver
 {
-    public function canAccess(Document $document, ?Authenticatable $user): bool
+    public function canAccess(Model $document, ?Authenticatable $user): bool
     {
-        // Votre logique métier :
-        // labo, rôle, année, permissions, etc.
-        return $user?->isAdmin() ?? false;
+        return $user !== null && $user->can('view', $document);
     }
 }
+```
 
+Then configure it:
 
-Puis configurez-le :
-
+```php
 'visibility' => [
-    'resolver' => \App\Services\ProcoradVisibilityResolver::class,
+    'resolver' => \App\Services\DocumentVisibilityResolver::class,
 ],
+```
 
+## Downloads
 
-À chaque téléchargement, le contrôleur appelle :
+Docstore registers the following route:
 
-$resolver->canAccess($document, auth()->user());
+```text
+GET /docstore/{id}/download
+```
 
-### Téléchargement de fichier
+The route is named:
 
-Le package expose une route :
+```text
+docstore.download
+```
 
-GET /docstore/{document}/download
+You can generate the download URL from a document model:
 
-
-Elle retourne un téléchargement seulement si le resolver valide l'accès.
-
-Pour obtenir l’URL d’un document :
-
+```php
 $url = $document->url();
+```
 
-### Ajout de documents (exemple)
+By default, the package expects the `path` column to contain the full relative path of the file on the configured filesystem disk.
 
-Voici un exemple d’upload simple :
+Example:
 
+```php
 $file = $request->file('file');
 
-$path = $file->store(config('docstore.base_path'), config('docstore.storage_disk'));
+$disk = config('docstore.storage_disk');
+$path = $file->store(config('docstore.base_path'), $disk);
 
 $documentClass = config('docstore.models.document');
 
 $document = $documentClass::create([
-    'folder_id' => $folder->id,
-    'title'     => $file->getClientOriginalName(),
-    'filename'  => $file->getClientOriginalName(),
+    'folder_id' => $folder?->id,
+    'title' => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
+    'filename' => $file->getClientOriginalName(),
     'mime_type' => $file->getMimeType(),
-    'size'      => $file->getSize(),
-    'disk'      => config('docstore.storage_disk'),
-    'path'      => $path,
+    'disk' => $disk,
+    'path' => $path,
+    'size' => $file->getSize(),
 ]);
+```
 
-## Tests
+## Artisan command
 
-Le package utilise Pest et PHPUnit.
-
-Pour lancer les tests :
-
-composer test
-
-Les tests utilisent Orchestra Testbench pour charger Laravel en mode package.
-
-## Commandes artisan
-
+```bash
 php artisan docstore:install
+```
 
-Publie :
+Options:
 
-configuration (docstore-config)
+```bash
+php artisan docstore:install --migrations
+php artisan docstore:install --force
+```
 
-migrations (--migrations)
+Published assets:
 
-## Architecture interne
-src/
-  Contracts/
-    DocumentVisibilityResolver.php
-  Models/
-    Document.php
-    Folder.php
-  Services/
-    AllowAllVisibilityResolver.php
-  Http/
-    Controllers/
-      DocumentDownloadController.php
-  Console/
-    InstallCommand.php
-  DocstoreServiceProvider.php
-config/
-  docstore.php
-database/
-  migrations/
-routes/
-  web.php
+- `docstore-config`
+- `docstore-migrations`
 
-## Contribution
+## Development
 
-Les contributions sont les bienvenues !
+Install dependencies:
 
-Forkez le dépôt
+```bash
+composer install
+```
 
-Créez une branche (feature/ma-fonctionnalite)
+Run tests:
 
-Ajoutez vos tests
+```bash
+composer test
+```
 
-Exécutez Pint, PHPStan et PHPUnit
+Run static analysis:
 
-Ouvrez une Pull Request
+```bash
+composer analyse
+```
 
-## Licence
+Check formatting:
 
-Ce package est distribué sous licence MIT.
+```bash
+composer lint
+```
 
-## Support
+Fix formatting:
 
-Pour toute question, vous pouvez ouvrir une issue GitHub ou contacter l’auteur du package.
+```bash
+composer format
+```
+
+## Versioning
+
+This package follows semantic versioning.
+
+Laravel 12 support is introduced in the `1.1.x` series.
+
+## License
+
+Docstore is open-source software licensed under the MIT license.

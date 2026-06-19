@@ -2,7 +2,6 @@
 
 namespace LaurentMeuwly\Docstore;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
@@ -20,8 +19,7 @@ class DocstoreServiceProvider extends ServiceProvider
             ], 'docstore-config');
 
             $this->publishes([
-                __DIR__.'/../database/migrations/create_docstore_tables.php.stub'
-                    => $this->getMigrationFileName('create_docstore_tables.php'),
+                __DIR__.'/../database/migrations/create_docstore_tables.php.stub' => $this->getMigrationFileName('create_docstore_tables.php'),
             ], 'docstore-migrations');
 
             $this->commands([
@@ -38,6 +36,7 @@ class DocstoreServiceProvider extends ServiceProvider
 
         $this->app->singleton(DocumentVisibilityResolver::class, function ($app) {
             $resolver = config('docstore.visibility.resolver', AllowAllVisibilityResolver::class);
+
             return $app->make($resolver);
         });
     }
@@ -52,8 +51,8 @@ class DocstoreServiceProvider extends ServiceProvider
         $filesystem = $this->app->make(Filesystem::class);
 
         return Collection::make([
-                $this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR
-            ])
+            $this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR,
+        ])
             ->flatMap(fn ($path) => $filesystem->glob($path.'*_'.$migrationFileName))
             ->push($this->app->databasePath()."/migrations/{$timestamp}_{$migrationFileName}")
             ->first();

@@ -2,16 +2,9 @@ includes:
   - vendor/larastan/larastan/extension.neon
 
 parameters:
-
-  # PHPStan strictness level (max 9)
   level: 6
 
   paths:
     - src
 
   checkMissingTypehints: false
-
-  ignoreErrors:
-    # Ignore Eloquent magic not recognized (rare but useful)
-    - '#Call to an undefined method Illuminate\\Database\\Eloquent\\.*#'
-    - '#Access to an undefined property Illuminate\\Database\\Eloquent\\.*#'

@@ -12,18 +12,16 @@ class InstallCommand extends Command
 
     protected $description = 'Install the Docstore package';
 
-    public function handle()
+    public function handle(): int
     {
         $this->info('Installing Docstore...');
 
-        // Publish config
         $this->info('Publishing configuration file...');
         $this->callSilentOrVerbose('vendor:publish', [
             '--tag' => 'docstore-config',
             '--force' => $this->option('force'),
         ]);
 
-        // Publish migrations if required
         if ($this->option('migrations')) {
             $this->info('Publishing migrations...');
             $this->callSilentOrVerbose('vendor:publish', [
@@ -34,18 +32,22 @@ class InstallCommand extends Command
 
         $this->info('Docstore installed successfully.');
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     /**
-     * Helper: use call() or callSilent() depending on verbose mode.
+     * Call an Artisan command silently by default, or verbosely when requested.
+     *
+     * @param  array<string, mixed>  $arguments
      */
     protected function callSilentOrVerbose(string $command, array $arguments = []): void
     {
         if ($this->output->isVerbose()) {
             $this->call($command, $arguments);
-        } else {
-            $this->callSilent($command, $arguments);
+
+            return;
         }
+
+        $this->callSilent($command, $arguments);
     }
 }

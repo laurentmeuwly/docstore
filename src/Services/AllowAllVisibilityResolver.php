@@ -3,12 +3,12 @@
 namespace LaurentMeuwly\Docstore\Services;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use LaurentMeuwly\Docstore\Contracts\DocumentVisibilityResolver;
-use LaurentMeuwly\Docstore\Models\Document;
 
 class AllowAllVisibilityResolver implements DocumentVisibilityResolver
 {
-    public function canAccess(Document $document, ?Authenticatable $user): bool
+    public function canAccess(Model $document, ?Authenticatable $user): bool
     {
         return true;
     }

@@ -1,16 +1,20 @@
 <?php
 
+use LaurentMeuwly\Docstore\Models\Document;
+use LaurentMeuwly\Docstore\Models\Folder;
+use LaurentMeuwly\Docstore\Services\AllowAllVisibilityResolver;
+
 return [
     'storage_disk' => 'local',
 
     'base_path' => 'docstore',
 
     'visibility' => [
-        'resolver' => \LaurentMeuwly\Docstore\Services\AllowAllVisibilityResolver::class,
+        'resolver' => AllowAllVisibilityResolver::class,
     ],
 
     'models' => [
-        'document'  => \LaurentMeuwly\Docstore\Models\Document::class,
-        'folder'    => \LaurentMeuwly\Docstore\Models\Folder::class,
+        'document' => Document::class,
+        'folder' => Folder::class,
     ],
 ];

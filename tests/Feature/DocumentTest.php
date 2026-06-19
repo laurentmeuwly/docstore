@@ -14,7 +14,7 @@ it('can create a document', function () {
 });
 
 it('generates a document url', function () {
-    $doc = new Document();
+    $doc = new Document;
     $doc->id = 12;
 
     $url = $doc->url();
