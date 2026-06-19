@@ -1,33 +1,71 @@
 # Changelog
-Toutes les modifications notables apportées à ce package seront consignées dans ce fichier.
 
-Le format suit les recommandations de [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)  
-et ce projet adhère au versionnage sémantique **SemVer**.
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+and this project adheres to **Semantic Versioning (SemVer)**.
 
 ---
 
 ## [Unreleased]
-### Ajouté
-- (exemple) Support de fichiers supplémentaires
 
-### Modifié
-- (exemple) Amélioration des performances dans les relations
-
-### Supprimé
-- (exemple) Retrait d’une méthode dépréciée
-
+### Added
+### Changed
+### Fixed
+### Removed
 
 ---
 
-## [1.0.0] – 2025-11-20  
+## [1.1.0] – 2026-06-19
 
-### Firts stable release
-- Complete document & folder models
-- Download controller with customizable visibility resolver
-- Publishable migrations
-- Configurable models & storage
-- Test suite with Pest v2
-- Laravel 10 & 11 compatible
-- Full Testbench integration
-- Cleaner service provider
-- Extensible visibility system
+### Added
+
+* Official support for Laravel 12.
+* MIT license file.
+* Comprehensive project README.
+* PHPStan static analysis configuration and fixes.
+* Improved model PHPDoc annotations for better IDE and static analysis support.
+* Strongly typed Eloquent relationships using Larastan generics.
+* Improved command method signatures and return types.
+* Package quality assurance workflow documentation.
+
+### Changed
+
+* Updated Composer constraints to support Laravel 10, 11 and 12.
+* Updated development dependencies for Laravel 12 compatibility.
+* Improved type safety across models, commands and services.
+* Simplified document download path handling.
+* Refined package structure and documentation.
+* Improved test environment configuration.
+
+### Fixed
+
+* Fixed PHPStan errors related to Eloquent relations and model properties.
+* Fixed test suite bootstrapping with Pest and Orchestra Testbench.
+* Fixed migration loading during package tests.
+* Fixed download controller test failures.
+* Fixed visibility resolver contract implementation.
+* Fixed Laravel 12 compatibility issues.
+
+### Quality
+
+* PHPStan analysis passing without errors.
+* Pest test suite fully passing.
+* Improved maintainability and long-term compatibility.
+
+---
+
+## [1.0.0] – 2025-11-20
+
+### Added
+
+* Initial stable release.
+* Complete Document and Folder models.
+* Download controller with customizable visibility resolver.
+* Publishable migrations.
+* Configurable models and storage.
+* Pest test suite.
+* Laravel 10 and Laravel 11 support.
+* Orchestra Testbench integration.
+* Extensible visibility resolver system.
+* Package service provider and configuration publishing.
