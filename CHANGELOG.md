@@ -8,13 +8,26 @@ and this project adheres to **Semantic Versioning (SemVer)**.
 ---
 
 ## [Unreleased]
-
+ 
 ### Added
 ### Changed
 ### Fixed
 ### Removed
-
+ 
 ---
+ 
+## [1.1.1] – 2026-06-20
+ 
+### Fixed
+ 
+* `Folder::parent()` and `Folder::children()` now actually use the model
+  returned by `static::model()` instead of hard-coding `self::class`. Any
+  application extending `Folder` (via `docstore.models.folder`) previously
+  got base-package `Folder` instances back from these two relations instead
+  of its own subclass, silently losing any extra casts, accessors or
+  relations defined there.
+---
+
 
 ## [1.1.0] – 2026-06-19
 

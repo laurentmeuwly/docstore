@@ -47,7 +47,7 @@ class Folder extends Model
         $model = static::model();
 
         /** @var BelongsTo<Folder, self> $relation */
-        $relation = $this->belongsTo(self::class, 'parent_id');
+        $relation = $this->belongsTo($model, 'parent_id');
 
         return $relation;
     }
@@ -60,7 +60,7 @@ class Folder extends Model
         $model = static::model();
 
         /** @var HasMany<Folder, self> $relation */
-        $relation = $this->hasMany(self::class, 'parent_id')
+        $relation = $this->hasMany($model, 'parent_id')
             ->orderBy('position')
             ->orderBy('id');
 
