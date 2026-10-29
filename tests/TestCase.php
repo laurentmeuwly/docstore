@@ -34,7 +34,7 @@ class TestCase extends Orchestra
 
     protected function defineDatabaseMigrations(): void
     {
-        $migration = include __DIR__ . '/../database/migrations/create_docstore_tables.php.stub';
+        $migration = include __DIR__.'/../database/migrations/create_docstore_tables.php.stub';
 
         $migration->up();
     }

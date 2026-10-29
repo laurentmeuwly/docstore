@@ -2,18 +2,39 @@
 
 namespace LaurentMeuwly\Docstore;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
+use InvalidArgumentException;
 use LaurentMeuwly\Docstore\Contracts\DocumentVisibilityResolver;
 use LaurentMeuwly\Docstore\Services\AllowAllVisibilityResolver;
 
 class DocstoreServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__.'/../config/docstore.php', 'docstore');
+
+        $this->app->singleton(DocumentVisibilityResolver::class, function (Application $app): DocumentVisibilityResolver {
+            $class = config('docstore.visibility.resolver', AllowAllVisibilityResolver::class);
+
+            $resolver = $app->make($class);
+
+            if (! $resolver instanceof DocumentVisibilityResolver) {
+                throw new InvalidArgumentException(sprintf(
+                    'The configured docstore visibility resolver [%s] must implement %s.',
+                    is_string($class) ? $class : get_debug_type($class),
+                    DocumentVisibilityResolver::class,
+                ));
+            }
+
+            return $resolver;
+        });
+    }
+
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-
             $this->publishes([
                 __DIR__.'/../config/docstore.php' => config_path('docstore.php'),
             ], 'docstore-config');
@@ -27,34 +48,26 @@ class DocstoreServiceProvider extends ServiceProvider
             ]);
         }
 
-        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
-    }
-
-    public function register(): void
-    {
-        $this->mergeConfigFrom(__DIR__.'/../config/docstore.php', 'docstore');
-
-        $this->app->singleton(DocumentVisibilityResolver::class, function ($app) {
-            $resolver = config('docstore.visibility.resolver', AllowAllVisibilityResolver::class);
-
-            return $app->make($resolver);
-        });
+        if (config('docstore.routes.enabled', true)) {
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        }
     }
 
     /**
-     * Returns existing migration file if found, else uses the current timestamp.
+     * Return the already published migration if it exists, otherwise a new
+     * timestamped path, so that re-publishing does not create duplicates.
      */
     protected function getMigrationFileName(string $migrationFileName): string
     {
-        $timestamp = date('Y_m_d_His');
+        $directory = $this->app->databasePath('migrations');
 
-        $filesystem = $this->app->make(Filesystem::class);
+        $existing = $this->app->make(Filesystem::class)
+            ->glob($directory.DIRECTORY_SEPARATOR.'*_'.$migrationFileName);
 
-        return Collection::make([
-            $this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR,
-        ])
-            ->flatMap(fn ($path) => $filesystem->glob($path.'*_'.$migrationFileName))
-            ->push($this->app->databasePath()."/migrations/{$timestamp}_{$migrationFileName}")
-            ->first();
+        if (is_array($existing) && $existing !== []) {
+            return $existing[0];
+        }
+
+        return $directory.DIRECTORY_SEPARATOR.date('Y_m_d_His').'_'.$migrationFileName;
     }
 }

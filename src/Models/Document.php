@@ -24,6 +24,12 @@ use Illuminate\Support\Carbon;
  */
 class Document extends Model
 {
+    /**
+     * Explicit table name so that subclasses with another class name
+     * (e.g. App\Models\ProjectDocument) keep using the package table.
+     */
+    protected $table = 'documents';
+
     protected $fillable = [
         'folder_id',
         'title',
@@ -40,6 +46,11 @@ class Document extends Model
         'size' => 'integer',
     ];
 
+    /**
+     * The document model class configured in `docstore.models.document`.
+     *
+     * @return class-string<Document>
+     */
     public static function model(): string
     {
         return config('docstore.models.document', self::class);
@@ -50,10 +61,8 @@ class Document extends Model
      */
     public function folder(): BelongsTo
     {
-        $folderClass = config('docstore.models.folder', Folder::class);
-
         /** @var BelongsTo<Folder, self> $relation */
-        $relation = $this->belongsTo($folderClass);
+        $relation = $this->belongsTo(Folder::model(), 'folder_id');
 
         return $relation;
     }

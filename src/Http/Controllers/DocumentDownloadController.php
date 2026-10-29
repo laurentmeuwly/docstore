@@ -2,6 +2,7 @@
 
 namespace LaurentMeuwly\Docstore\Http\Controllers;
 
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use LaurentMeuwly\Docstore\Contracts\DocumentVisibilityResolver;
@@ -16,32 +17,38 @@ class DocumentDownloadController
 
     public function __invoke(Request $request, string|int $id): StreamedResponse
     {
-        $model = config('docstore.models.document', Document::class);
+        /** @var class-string<Document> $model */
+        $model = Document::model();
 
-        /** @var Document $document */
-        $document = $model::findOrFail($id);
+        $document = $model::query()->findOrFail($id);
 
         if (! $this->resolver->canAccess($document, $request->user())) {
             abort(403);
         }
 
-        $disk = $document->disk ?: config('docstore.storage_disk');
-        $path = $document->path;
+        /** @var FilesystemAdapter $disk */
+        $disk = Storage::disk($document->disk ?: config('docstore.storage_disk'));
 
-        if (! Storage::disk($disk)->exists($path)) {
+        if (! $disk->exists($document->path)) {
             abort(404, 'Document file not found.');
         }
 
         $mimeType = $document->mime_type ?: 'application/octet-stream';
         $inline = $request->boolean('inline') && $mimeType === 'application/pdf';
 
-        return Storage::disk($disk)->response(
-            $path,
-            $document->filename,
+        // Let the filesystem adapter build the Content-Disposition header
+        // (Symfony HeaderUtils): it escapes quotes and handles non-ASCII
+        // names. Path separators are not allowed in a disposition file name.
+        $filename = basename(str_replace('\\', '/', $document->filename ?: $document->path));
+
+        return $disk->response(
+            $document->path,
+            $filename,
             [
                 'Content-Type' => $mimeType,
-                'Content-Disposition' => ($inline ? 'inline' : 'attachment').'; filename="'.$document->filename.'"',
-            ]
+                'X-Content-Type-Options' => 'nosniff',
+            ],
+            $inline ? 'inline' : 'attachment',
         );
     }
 }
