@@ -1,7 +1,7 @@
 # Docstore
 
 [![Tests](https://github.com/laurentmeuwly/docstore/actions/workflows/tests.yml/badge.svg)](https://github.com/laurentmeuwly/docstore/actions/workflows/tests.yml)
-[![Latest Release](https://img.shields.io/github/v/release/laurentmeuwly/docstore?sort=semver)](https://github.com/laurentmeuwly/docstore/releases)
+[![Latest Tag](https://img.shields.io/github/v/tag/laurentmeuwly/docstore?sort=semver)](https://github.com/laurentmeuwly/docstore/tags)
 ![Laravel](https://img.shields.io/badge/Laravel-12%20|%2013-red)
 ![PHP](https://img.shields.io/badge/PHP-8.2%20|%208.3%20|%208.4-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
