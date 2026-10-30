@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/laurentmeuwly/docstore/actions/workflows/tests.yml/badge.svg)](https://github.com/laurentmeuwly/docstore/actions/workflows/tests.yml)
 [![Latest Version](https://img.shields.io/packagist/v/laurentmeuwly/docstore.svg)](https://packagist.org/packages/laurentmeuwly/docstore)
-![Laravel](https://img.shields.io/badge/Laravel-10%20|%2011%20|%2012%20|%2013-red)
+![Laravel](https://img.shields.io/badge/Laravel-12%20|%2013-red)
 ![PHP](https://img.shields.io/badge/PHP-8.2%20|%208.3%20|%208.4-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -27,13 +27,13 @@ It deliberately does **not** provide an upload UI, a file browser or permissions
 
 | Docstore | Laravel              | PHP            |
 |----------|----------------------|----------------|
-| 1.2.x    | 10, 11, 12, 13       | 8.2 – 8.4      |
+| 1.2.x    | 12, 13               | 8.2 – 8.4      |
 | 1.1.x    | 10, 11, 12           | 8.2+           |
 | 1.0.x    | 10, 11               | 8.2+           |
 
-Laravel 13 itself requires PHP 8.3 or later, and Laravel 10 does not run on PHP 8.4; Composer picks the right combination for you.
+Laravel 13 itself requires PHP 8.3 or later; Composer picks the right combination for you.
 
-> Laravel 10 and 11 no longer receive security fixes. Their support in Docstore is kept for convenience and is planned to be dropped in the next major version.
+Laravel 10 and 11 no longer receive security fixes and are not supported from 1.2.0 on. Applications still on those versions keep receiving Docstore 1.1.x.
 
 ## Installation
 
@@ -260,7 +260,7 @@ Deleting a `Document` record does **not** delete the stored file; do it in your 
 
 See [CHANGELOG.md](CHANGELOG.md) for details.
 
-**1.1 → 1.2** — no breaking change. Run `composer update laurentmeuwly/docstore`. Re-publishing the configuration (`php artisan docstore:install --force`) is optional; it only adds the new `routes` section, whose defaults reproduce the previous behaviour.
+**1.1 → 1.2** — requires Laravel 12 or 13. No code change is needed. Run `composer update laurentmeuwly/docstore`. Re-publishing the configuration (`php artisan docstore:install --force`) is optional; it only adds the new `routes` section, whose defaults reproduce the previous behaviour.
 
 ## Development
 

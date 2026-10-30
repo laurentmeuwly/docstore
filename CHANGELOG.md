@@ -28,6 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Minimum Laravel version is now 12.** Laravel 10 and 11 are end-of-life
+  (no more security fixes) and their releases are blocked by Composer's
+  security-advisory policy. Composer keeps resolving 1.1.x for applications
+  still on those versions.
+- Development dependencies aligned on the Laravel 12/13 toolchain: Testbench
+  10/11, Pest 3/4, PHPUnit 11.5/12, PHPStan 2 and Larastan 3.
 - `php` constraint narrowed from `>=8.2` to `^8.2`.
 - The package now declares the Illuminate components it actually uses
   (`console`, `database`, `filesystem`, `http`, `routing`, `support`) instead of
@@ -59,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Laravel 10 and 11 support.
 - Unused `laravel/passport` development dependency.
 
 ## [1.1.1] - 2026-06-20
