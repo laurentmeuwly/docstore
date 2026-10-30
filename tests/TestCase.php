@@ -3,6 +3,7 @@
 namespace LaurentMeuwly\Docstore\Tests;
 
 use LaurentMeuwly\Docstore\DocstoreServiceProvider;
+use LaurentMeuwly\Docstore\Tests\Fixtures\User;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
@@ -28,7 +29,7 @@ class TestCase extends Orchestra
 
         $app['config']->set(
             'auth.providers.users.model',
-            \LaurentMeuwly\Docstore\Tests\Fixtures\User::class
+            User::class
         );
     }
 

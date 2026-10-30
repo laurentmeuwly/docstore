@@ -9,6 +9,4 @@ use LaurentMeuwly\Docstore\Models\Folder;
  * `docstore.models.folder`. Used to assert that relations defined on
  * Folder resolve to this subclass rather than the base Folder class.
  */
-class CustomFolder extends Folder
-{
-}
+class CustomFolder extends Folder {}
