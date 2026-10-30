@@ -27,10 +27,7 @@ class TestCase extends Orchestra
         $app['config']->set('docstore.storage_disk', 'local');
         $app['config']->set('docstore.base_path', 'docstore');
 
-        $app['config']->set(
-            'auth.providers.users.model',
-            User::class
-        );
+        $app['config']->set('auth.providers.users.model', User::class);
     }
 
     protected function defineDatabaseMigrations(): void

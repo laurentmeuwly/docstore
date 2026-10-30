@@ -64,6 +64,8 @@ class DocstoreServiceProvider extends ServiceProvider
         $existing = $this->app->make(Filesystem::class)
             ->glob($directory.DIRECTORY_SEPARATOR.'*_'.$migrationFileName);
 
+        // glob() is documented as returning an array but may return false on
+        // some systems; `??` covers both cases without a warning.
         return $existing[0] ?? $directory.DIRECTORY_SEPARATOR.date('Y_m_d_His').'_'.$migrationFileName;
     }
 }

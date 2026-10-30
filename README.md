@@ -1,7 +1,7 @@
 # Docstore
 
 [![Tests](https://github.com/laurentmeuwly/docstore/actions/workflows/tests.yml/badge.svg)](https://github.com/laurentmeuwly/docstore/actions/workflows/tests.yml)
-[![Latest Version](https://img.shields.io/packagist/v/laurentmeuwly/docstore.svg)](https://packagist.org/packages/laurentmeuwly/docstore)
+[![Latest Release](https://img.shields.io/github/v/release/laurentmeuwly/docstore?sort=semver)](https://github.com/laurentmeuwly/docstore/releases)
 ![Laravel](https://img.shields.io/badge/Laravel-12%20|%2013-red)
 ![PHP](https://img.shields.io/badge/PHP-8.2%20|%208.3%20|%208.4-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -37,9 +37,24 @@ Laravel 10 and 11 no longer receive security fixes and are not supported from 1.
 
 ## Installation
 
-```bash
-composer require laurentmeuwly/docstore
+Docstore is not published on Packagist. Declare the GitHub repository in your application's `composer.json`:
+
+```json
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "https://github.com/laurentmeuwly/docstore"
+    }
+]
 ```
+
+then require it:
+
+```bash
+composer require laurentmeuwly/docstore:^1.2
+```
+
+Composer reads the available versions from the repository's Git tags (`v1.2.0`, …).
 
 The service provider is registered automatically (package auto-discovery).
 
